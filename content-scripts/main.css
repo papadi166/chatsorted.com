@@ -1,0 +1,27 @@
+[data-testid=mwthreadlist-item-open] {
+    background-color: white;
+}
+
+
+.thread_input {
+    background-color: black;
+    position: absolute;
+    top: 0;
+    left: 0.5;
+    margin: 3px 3px 3px 4px;
+    
+}
+
+.tag-container {
+    position: absolute;
+    margin-right: 21%;
+    background-color: white;
+    width: 27%;
+    height:30%;
+    top: 0;
+    left: 60%;
+}
+
+.tag-container:hover {
+    background-color: red;
+}

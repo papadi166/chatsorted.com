@@ -1,14 +1,26 @@
 {
     "name": "chatsorted.com",
-    "description": "todo app",
+    "description": "messenger sorting app",
     "version": "0.1",
+    "manifest_version": 3,
+
+    "permissions": ["storage", "tabs"],
     "chrome_url_overrides": {
         "newtab": "index.html"
     },
-    "manifest_version": 3,
     "action": {
         "default_popup": "index.html"
-    }
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+      },
+
+    "content_scripts": [{
+        "matches": ["https://www.messenger.com/*"],
+        "js": ["content-scripts/main.js"],
+        "css": ["content-scripts/main.css"]
+      }]
     
       
   }

@@ -4,5 +4,6 @@
 
 
 body {
-    min-width:800px;
+    min-width:750px;
+    overflow-x: hidden;
 }

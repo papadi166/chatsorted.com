@@ -2,6 +2,25 @@
 import { reactive, watch, ref } from "vue";
 import HelloWorld from "./components/HelloWorld.vue";
 import uniqid from "uniqid";
+import { h } from "vue";
+//import IconTrash from "~icons/bx/trash";
+
+let tags = [
+  { id: uniqid(), tag_name: "example group" },
+  { id: uniqid(), tag_name: "example group2" },
+];
+
+let friendsData = [
+  {
+    name: "Example Example",
+    tags: [
+      { id: uniqid(), tag_name: "example example" },
+      { id: uniqid(), tag_name: "example example2" },
+    ],
+  },
+];
+
+h("div", { class: "bar", innerHTML: "hello" });
 </script>
 
 <template>
