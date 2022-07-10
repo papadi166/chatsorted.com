@@ -14,8 +14,11 @@
     "skipLibCheck": true,
     "types": [
       "unplugin-icons/types/vue",
+      "pinia-plugin-persist",
+      "pinia"
     ]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/*.vue", "src/main.js", "views/**/*.vue", "views/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]
+  
 }

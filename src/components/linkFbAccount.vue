@@ -1,5 +1,4 @@
 <template lang="pug">
-p siema
 </template>
 
 <script setup lang="ts"></script>

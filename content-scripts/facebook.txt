@@ -1,0 +1,4 @@
+appId = clientId = 1747349682266645
+appSecret = clientSecret = 9fd61252fe721c5ba95691995b944aa7
+redirectURI =
+URLENCODE(redirectURI) =

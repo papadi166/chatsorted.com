@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-    min-width:750px;
-    overflow-x: hidden;
+  min-width: 770px;
+  min-height: 600px;
+  overflow-x: hidden;
 }

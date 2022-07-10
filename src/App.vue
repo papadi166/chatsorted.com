@@ -1,31 +1,22 @@
 <script setup lang="ts">
 import { reactive, watch, ref } from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
-import uniqid from "uniqid";
-import { h } from "vue";
+import Navbar from "./components/Navbar.vue";
+import { useStore } from "../store/store";
+
+let store = useStore();
+
+localStorage.setItem("store", store.friendsData[0].name);
 //import IconTrash from "~icons/bx/trash";
-
-let tags = [
-  { id: uniqid(), tag_name: "example group" },
-  { id: uniqid(), tag_name: "example group2" },
-];
-
-let friendsData = [
-  {
-    name: "Example Example",
-    tags: [
-      { id: uniqid(), tag_name: "example example" },
-      { id: uniqid(), tag_name: "example example2" },
-    ],
-  },
-];
-
-h("div", { class: "bar", innerHTML: "hello" });
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <Navbar
+    v-if="
+      store.validated === true &&
+      store.actualUrl.startsWith('https://www.messenger.com/')
+    "
+  />
+  <router-view></router-view>
 </template>
 
 <style>
@@ -35,6 +26,6 @@ h("div", { class: "bar", innerHTML: "hello" });
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  min-height: 100vh;
 }
 </style>
