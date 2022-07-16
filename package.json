@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@vue/runtime-core": "^3.2.37",
+    "@vueuse/core": "^8.9.1",
     "eslint": "^8.19.0",
     "js-cookie": "^3.0.1",
     "pinia": "^2.0.14",

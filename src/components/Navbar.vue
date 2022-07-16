@@ -7,8 +7,8 @@
     ul#navigation(class="flex justify-around w-3/6 items-center  ")
         li#manual-sync
             IconSync(class="w-6 h-6")
-        li#targeted-friends
-            PlusIcon(class="w-5 h-5")  
+        li#targeted-friends(@click="Sync()")
+            PlusIcon(class="w-5 h-5" )  
         li#friend-request-feature
             UserPlus(class="w-7 h-7")
         li#reminder
@@ -27,6 +27,12 @@ import UserPlus from "~icons/bxs/user-plus";
 import PlusIcon from "~icons/fa-solid/plus";
 import NotificationSolidIcon from "~icons/clarity/notification-solid";
 import UserAvatarSolidIcon from "~icons/carbon/user-avatar-filled-alt";
+import Sync from "../functions/Sync";
+
+import { useStore } from "../../store/store";
+
+let store = useStore();
+let chrome = window.chrome;
 </script>
 
 <style lang="sass">

@@ -1,12 +1,47 @@
 <script setup lang="ts">
-import { reactive, watch, ref } from "vue";
+import { reactive, watch, ref, onMounted } from "vue";
 import Navbar from "./components/Navbar.vue";
 import { useStore } from "../store/store";
+import Sync from "./functions/Sync";
 
 let store = useStore();
+let chrome = window.chrome;
 
-localStorage.setItem("store", store.friendsData[0].name);
+const downloadFriends = () => {
+  chrome.storage.local.get("friends", function (data) {
+    console.log(data);
+  });
+};
+
 //import IconTrash from "~icons/bx/trash";
+
+Sync();
+downloadFriends();
+console.log("test");
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log(
+    sender.tab
+      ? "from a content script:" + sender.tab.url
+      : "from the extension"
+  );
+  console.log(request.type);
+  if (request.type === "addTag") {
+    store.addTag(request.tag_name, request.color, request.people);
+  }
+  if (request.type === "saveTags") {
+    store.saveTags(request.tags);
+  }
+  if (request.type === "addFriend") {
+    store.addFriend(request.tag_name, request.friend_name);
+  }
+  if (request.type === "removeFriend") {
+    store.removeFriend(request.tag_name, request.friend_name);
+  }
+  if (request.type === "changeTagName") {
+    store.changeTagName(request.tag_name, request.new_tag_name);
+  }
+});
 </script>
 
 <template>

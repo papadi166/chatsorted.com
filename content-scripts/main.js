@@ -8,14 +8,89 @@ import './main.css'
 let thread_list = ''
 //let thread_count_previous = thread_list.length
 let friends = []
-let chatsContainer = document.querySelector('.l9j0dhe7')
 
 
+let friendsData = window.location.href;
+
+
+let modal = document.createElement('div')
+modal.classList.add('modal')
+modal.setAttribute('id', 'myModal' )
+let modal_content = document.createElement('div')
+modal_content.classList.add('modal-content')
+const close = document.createElement('span')
+close.classList.add('close')
+const p = document.createElement('p')
+p.textContent = 'Some text in the Modal..'
+
+modal_content.appendChild(close)
+modal_content.appendChild(p)
+modal.appendChild(modal_content)
+
+close.addEventListener('click', () => {
+  modal.style.display = "none";
+} )
+
+
+//document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').appendChild(modal)
+
+//document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').addEventListener('click', () => { 
+ //   if(window.getComputedStyle(modal).display === "block") {
+ //     modal.style.display = "none";
+ //   }
+ //   else {
+ //     modal.style.display = "block";
+ //   }
+ // })
+
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    sessionStorage.setItem('tags', request.message)
+    console.log('request' + sessionStorage.getItem('tags'))
+  }
+);
+
+const addTag = (tag_name, color, people) => { 
+  chrome.runtime.sendMessage({type: "addTag", tag_name: tag_name, color: color, people: people});
+}
+
+const saveTags = (tags) => {
+  chrome.runtime.sendMessage({type: "saveTags", tags: tags})
+}
+
+const updateTag = (type, tag_name, value) => {
+  if( type === 'addFriend') {
+    chrome.runtime.sendMessage({type: "addFriend", tag_name: tag_name, friend_name: value})
+  }
+  if(type === 'removeFriend') {
+    chrome.runtime.sendMessage({type: "removeFriend", tag_name: tag_name, friend_name: value})
+  }
+  if(type === 'changeTagName') {
+    chrome.runtime.sendMessage({type: "changeTagName", tag_name: tag_name, new_tag_name: value})
+  }
+}
+
+const syncExtension() = () => {
+  
+}
+
+function start(data){
+    sessionStorage.setItem('tags', data)
+    console.log(sessionStorage.getItem('tags'))
+}
 
 function updateDom() {
+  let tags = []
+  tags = JSON.parse(sessionStorage.getItem('tags'))
+
   
+  
+  console.log(tags)
  
   console.log("updating Dom")
+
   //let thread_count = 0
   //thread_count_previous = thread_count
 
@@ -36,70 +111,112 @@ function updateDom() {
   tagAll_button.textContent = 'Tag All'
 
   if (thread_list.length > 0) {
-    chatsContainer = thread_list[0].parentNode.parentNode
-    //for(let i = (thread_count - thread_count_previous)-1; i === 0; i-- )
+
+
     thread_list.forEach((thread) => {
+      
       if(!thread.querySelector('.thread_input')) {
+
         let thread_input = document.createElement("input");
         thread_input.setAttribute("class", "thread_input");
-        thread_input.setAttribute("type", "checkbox");
+        thread_input.setAttribute("type", "checkbox")
+        let tag_container = document.createElement("div");
+        tag_container.setAttribute("class", "tag-container");
+        
+        // Collect friend nickname from div
         let friend_name = thread.children[0].children[0].children[0].children[0].children[1].children[0].children[0].children[0].textContent
         let friend = {
           "friend_name": friend_name,
-          "tags": ["example", "constructors"],
+          "tags": [],
         }
 
-        friends.push(friend)
-        const friendData = friends.find(friend => friend.friend_name === friend.friend_name)
-
-        let tag_container = document.createElement("div");
-        tag_container.setAttribute("class", "tag-container");
-        let dropdown_content = document.createElement("div");
-        dropdown_content.setAttribute("class", "dropdown-content");
-        let p = document.createElement("p");
-        p.textContent = "test"
-        dropdown_content.appendChild(p)
-        tag_container.appendChild(dropdown_content)
-        tag_container.textContent = friendData.tags
-
-        console.log(friendData)
-
-        let test = document.createElement('div')
-
-        if(friendData.tags.length <= 0) {
-          test.innerHTML = `
-            <div class="tag-container">
-            <ul>
-            <li ><a>+</a>
-              <ul class="dropdown">
-                <li><a>Notes</a></li>
-              </ul>
-            </li>
-          </ul>
-          </div>
-            `
-        } else {
-          test.innerHTML = `
-          <div class="tag-container">
-            <ul>
-              <li ><a>${friendData.tags}</a>
-                <ul class="dropdown">
-                  <li><a>Notes</a></li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-            `
-        }
+        
+        
+        // download tags from vue app (popup)
         
 
-        //let addTagModal = document.createElement('div')
 
-        thread.appendChild(thread_input);
-        thread.appendChild(test);
+         // if friend is inside tags then: 1.append this tag to this friend, 2. add this tag to div as class.
+         friend.tags = []
+         // saving test
 
-        chatsContainer.classList.add('chats-container')
-        console.log('chatContainer: ' + chatsContainer)
+        // Testing adding tag
+
+        
+
+
+        
+        // Testing adding friend to tag
+        //updateTag('addFriend', "Tesstingtag", friend.friend_name )
+        // Testing removing friend from tag
+        thread.setAttribute('id', friend_name)
+        
+        tags = tags.forEach(tag => {
+
+          if(tag.people.find((person) => person.realname === friend_name)) {
+            console.log("okk")
+            
+            friend.tags.push(tag.tag_name)
+            thread.classList.add(tag.tag_name)
+            
+          }
+        })
+        // Add friend to friend list
+        friends.push(friend)
+
+        let ul = document.createElement("ul");
+
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        a.textContent = friend.tags
+        a.setAttribute("class", 'tag-a')
+        let ul2 = document.createElement("ul");
+        ul2.setAttribute("class", "dropdown");
+        let li2 = document.createElement("li");
+        let a2 = document.createElement("a");
+        a2.textContent = 'Notes'
+        li2.appendChild(a2)
+        ul2.appendChild(li2)
+        li.appendChild(a)
+        li.appendChild(ul2)
+        ul.appendChild(li)
+        tag_container.appendChild(ul)
+        
+      
+        
+       
+        
+        
+        console.log(friend)
+
+        
+
+        
+
+        // when user click at tags-container then open tags modal
+        tag_container.addEventListener('click', () => {
+          console.log(friend.friend_name)
+          modal.style.display = "block";
+          updateTag('addFriend', "Tesstingtag", friend.friend_name )
+          syncExtension()
+
+          updateDom()
+        })
+        
+
+        //append checkbox and tag-container to thread
+
+        if(thread.querySelector('.tag-container')) {
+            let e = thread.querySelector('.tag-container')
+            thread.removeChild(e)
+            thread.appendChild(tag_container);
+          } else {
+            thread.appendChild(thread_input);
+            thread.appendChild(tag_container);
+          }
+        
+  
+
         
      
         let i = 1
@@ -116,8 +233,36 @@ function updateDom() {
           i++
          
         })
+        } else {
+          let tags = JSON.parse(sessionStorage.getItem('tags'))
+          let tag_a = thread.querySelector('.tag-container').querySelector('ul').querySelector('li').querySelector('a')
+
+            console.log('a :' + tag_a.textContent)
+
+            let friend_name = thread.getAttribute('id')
+
+            
+            
+            tags = tags.forEach(tag => {
+
+              let person = tag.people.find((person) => person.realname === friend_name)
+              if(person) {
+                console.log("okk: " + person.realname)
+                
+                thread.classList.add(tag.tag_name)
+                tag_a.textContent = tag.tag_name
+                
+              }
+            })
+            
+
+          
+          
+
         }
     });
+    chrome.storage.local.set({'friends':friends});
+    
   }
 }
 
