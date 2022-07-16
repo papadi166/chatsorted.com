@@ -72,9 +72,9 @@ const updateTag = (type, tag_name, value) => {
   }
 }
 
-const syncExtension() = () => {
-  
-}
+//const syncExtension() = () => {
+//  console.log('test')
+//}
 
 function start(data){
     sessionStorage.setItem('tags', data)
@@ -198,7 +198,6 @@ function updateDom() {
           console.log(friend.friend_name)
           modal.style.display = "block";
           updateTag('addFriend', "Tesstingtag", friend.friend_name )
-          syncExtension()
 
           updateDom()
         })
