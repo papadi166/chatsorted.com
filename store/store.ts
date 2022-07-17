@@ -71,24 +71,31 @@ export const useStore = defineStore('chatsorted', {
         },
         saveTags(tags: Object) {
           this.tags = tags
+          
         },
-        addFriend(tag_name: string, friend_name: string) {
+        updateTag(tag_name: string, new_tag_name: string) {
+          console.log(new_tag_name)
           let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
-          if (focusingTag.people.some(e => e.realname === friend_name)) {
-            console.log('this tag already has this friend')
-          } else {
-            focusingTag.people.push({realname: friend_name})
-          }
+          focusingTag.tag_name = new_tag_name
           Sync(this)
         },
-        removeFriend(tag_name: string, friend_name: string) {
-          let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
-          focusingTag.people = focusingTag.people.filter(person => person.realname != friend_name)
-          Sync(this)
-        },
-        changeTagName(tag_name: string, new_tag_name: string) {
-
-        },
+        //addFriend(tag_name: string, friend_name: string) {
+        //  let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
+        //  if (focusingTag.people.some(e => e.realname === friend_name)) {
+        //    console.log('this tag already has this friend')
+        //  } else {
+         //   focusingTag.people.push({realname: friend_name})
+         // }
+         // Sync(this)
+        //},
+        //removeFriend(tag_name: string, friend_name: string) {
+        //  let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
+        //  focusingTag.people = focusingTag.people.filter(person => person.realname != friend_name)
+        //  Sync(this)
+        //},
+       // changeTagName(tag_name: string, new_tag_name: string) {
+        //
+       //},
         deleteTag(card) {
           this.tags = this.tags.filter(tag => {
             return tag.id != card.id;

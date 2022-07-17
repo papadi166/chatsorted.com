@@ -23,7 +23,7 @@ div#tags
             div.tag-card(v-for="card in store.tags" :key="card.id" @click="store.setFocused(card)" class="flex-column  min-h-min mt-3  w-full rounded-2xl" :style="`background-color: ${card.color}`"  )
                 div.tag-card-header(class="flex w-full h-12 justify-around px-4 py-2 items-center" )
                     
-                    input.tag-card-input(class="w-full h-2/5 focus:outline-0  indent-1 mb-2 text-white" :value="card.tag_name" :style="`background-color: ${card.color}`" v-show="card.editing" @change="updateTag($event, card)")
+                    input.tag-card-input(class="w-full h-2/5 focus:outline-0  indent-1 mb-2 text-white" :value="card.tag_name" :style="`background-color: ${card.color}`" v-show="card.editing" @change="updateTag(card.tag_name, $event)")
                     p(class="text-white w-full text-left" v-show="!card.editing")  {{card.tag_name}}
                     button#folder(class="ml-2" @click="card.folded = !card.folded; card.editing = false")
                         ChevronDownIcon(class=" text-white" )
@@ -59,8 +59,8 @@ const addTag = (tag_name: string, color: string, people: Array<any>) => {
   store.addTag(tag_name, color, people);
 };
 
-const updateTag = (event, tag) => {
-  console.log((tag.tag_name = event.target.value));
+const updateTag = (tag_name, event) => {
+  store.updateTag(tag_name, event.target.value);
   //card.tag_name=this.value
 };
 

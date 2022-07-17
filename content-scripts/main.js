@@ -1,6 +1,5 @@
 //function updateDom = chrome.runtime.getURL("content-scripts/utils/updateDom.js");
-
-
+import { updateTag } from '../src/functions/Saving'
 
 let sortBy = "example"
 import './main.css'
@@ -9,8 +8,7 @@ let thread_list = ''
 //let thread_count_previous = thread_list.length
 let friends = []
 
-
-let friendsData = window.location.href;
+let tags = []
 
 
 let modal = document.createElement('div')
@@ -19,6 +17,7 @@ modal.setAttribute('id', 'myModal' )
 let modal_content = document.createElement('div')
 modal_content.classList.add('modal-content')
 const close = document.createElement('span')
+close.textContent = "X"
 close.classList.add('close')
 const p = document.createElement('p')
 p.textContent = 'Some text in the Modal..'
@@ -27,50 +26,40 @@ modal_content.appendChild(close)
 modal_content.appendChild(p)
 modal.appendChild(modal_content)
 
+// closing modal only if clicked element is modal background and ...
+modal.addEventListener('click', ($event) => {
+  if($event.target.classList.contains('modal-content')) {
+    console.log('test okk')
+  } else if($event.target.classList.contains('modal')) {
+    modal.style.display = "none"
+  }
+  
+})
+// closing modal if closing button clicked
 close.addEventListener('click', () => {
-  modal.style.display = "none";
+  if(window.getComputedStyle(modal).display === "block") {
+    modal.style.display = "none";
+  }
+  
 } )
 
 
-//document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').appendChild(modal)
 
-//document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').addEventListener('click', () => { 
- //   if(window.getComputedStyle(modal).display === "block") {
- //     modal.style.display = "none";
- //   }
- //   else {
- //     modal.style.display = "block";
- //   }
- // })
-
-
+document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').appendChild(modal)
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    sessionStorage.setItem('tags', request.message)
-    console.log('request' + sessionStorage.getItem('tags'))
+    if(request.type === 'giveMeTags') {
+      chrome.runtime.sendMessage({type: 'saveTags', tags: JSON.parse(sessionStorage.getItem('tags'))});
+    } else {
+      sessionStorage.setItem('tags', request.message)
+      console.log('request' + sessionStorage.getItem('tags'))
+    }
+    
   }
 );
 
-const addTag = (tag_name, color, people) => { 
-  chrome.runtime.sendMessage({type: "addTag", tag_name: tag_name, color: color, people: people});
-}
 
-const saveTags = (tags) => {
-  chrome.runtime.sendMessage({type: "saveTags", tags: tags})
-}
-
-const updateTag = (type, tag_name, value) => {
-  if( type === 'addFriend') {
-    chrome.runtime.sendMessage({type: "addFriend", tag_name: tag_name, friend_name: value})
-  }
-  if(type === 'removeFriend') {
-    chrome.runtime.sendMessage({type: "removeFriend", tag_name: tag_name, friend_name: value})
-  }
-  if(type === 'changeTagName') {
-    chrome.runtime.sendMessage({type: "changeTagName", tag_name: tag_name, new_tag_name: value})
-  }
-}
 
 //const syncExtension() = () => {
 //  console.log('test')
@@ -82,9 +71,8 @@ function start(data){
 }
 
 function updateDom() {
-  let tags = []
+  
   tags = JSON.parse(sessionStorage.getItem('tags'))
-
   
   
   console.log(tags)
@@ -194,10 +182,10 @@ function updateDom() {
         
 
         // when user click at tags-container then open tags modal
-        tag_container.addEventListener('click', () => {
+        tag_container.addEventListener('click', (event) => {
           console.log(friend.friend_name)
           modal.style.display = "block";
-          updateTag('addFriend', "Tesstingtag", friend.friend_name )
+          updateTag('addFriend', "Tesstingtagds", friend.friend_name )
 
           updateDom()
         })
@@ -206,14 +194,25 @@ function updateDom() {
         //append checkbox and tag-container to thread
 
         if(thread.querySelector('.tag-container')) {
+            // if tag container already exists, first remove old tag container then add another
             let e = thread.querySelector('.tag-container')
             thread.removeChild(e)
             thread.appendChild(tag_container);
           } else {
+            // if tag container doesn't exist then add tag container and thread input
             thread.appendChild(thread_input);
             thread.appendChild(tag_container);
           }
-        
+
+          document.querySelector('.tag-container').addEventListener('click', () => { 
+            if(window.getComputedStyle(modal).display === "block") {
+              modal.style.display = "none";
+            }
+            else {
+              modal.style.display = "block";
+            }
+          })
+
   
 
         
@@ -236,28 +235,20 @@ function updateDom() {
           let tags = JSON.parse(sessionStorage.getItem('tags'))
           let tag_a = thread.querySelector('.tag-container').querySelector('ul').querySelector('li').querySelector('a')
 
-            console.log('a :' + tag_a.textContent)
-
             let friend_name = thread.getAttribute('id')
 
-            
-            
+            //'looping trought tags to find person inside from thread and give the thread attributes'
             tags = tags.forEach(tag => {
 
               let person = tag.people.find((person) => person.realname === friend_name)
               if(person) {
-                console.log("okk: " + person.realname)
+                
                 
                 thread.classList.add(tag.tag_name)
                 tag_a.textContent = tag.tag_name
                 
               }
             })
-            
-
-          
-          
-
         }
     });
     chrome.storage.local.set({'friends':friends});
