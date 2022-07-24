@@ -1,5 +1,5 @@
-//function updateDom = chrome.runtime.getURL("content-scripts/utils/updateDom.js");
-import { updateTag } from '../src/functions/Saving'
+
+import { saveTags, updateTag, updateFriend } from '../src/functions/Saving'
 
 let sortBy = "example"
 import './main.css'
@@ -7,8 +7,54 @@ import './main.css'
 let thread_list = ''
 //let thread_count_previous = thread_list.length
 let friends = []
+let content_lived_before = false
 
-let tags = []
+const loadTags = () => {
+
+  try {
+    tags = JSON.parse(sessionStorage.getItem('tags'))
+    console.log("tags parsed as")
+    console.log(JSON.parse(sessionStorage.getItem('tags')))
+    
+  } catch {
+    tags = sessionStorage.getItem('tags')
+    console.log("tags not parsed as")
+    console.log(tags)
+  }
+
+}
+
+let tags = ''
+loadTags()
+
+
+if(tags === null || tags === 'undefined' || typeof(tags) === 'string') {
+  // if tags are undefined then user first time run the extension, so create starting template for him
+  // load tags from extension if session Storage Tags are not defined
+ 
+
+    tags = [
+      { id: 1, tag_name: "konstruktorzy", color: 'red', folded: true, editing: true, people: [
+        {realname: 'Dawid Kudrel'},
+        {realname: 'example example'}
+      ] },
+      { id: 2, tag_name: "example example2", color: 'blue', people: [
+        {realname: 'test2a a '}
+      ]  },
+    ]
+    content_lived_before = false
+    console.log(tags)
+    sessionStorage.setItem('tags', JSON.stringify(tags))
+
+    console.log('tags saved as new')
+
+  } else {
+    console.log('tags saved from session storage')
+    content_lived_before = true
+  }
+
+  saveTags(tags)
+  console.log('tags: ' + tags)
 
 
 let modal = document.createElement('div')
@@ -16,14 +62,41 @@ modal.classList.add('modal')
 modal.setAttribute('id', 'myModal' )
 let modal_content = document.createElement('div')
 modal_content.classList.add('modal-content')
+let modal_head = document.createElement('div')
+modal_head.setAttribute('id', 'modal-head')
 const close = document.createElement('span')
 close.textContent = "X"
 close.classList.add('close')
-const p = document.createElement('p')
-p.textContent = 'Some text in the Modal..'
+const p = document.createElement('a')
+p.textContent = 'title'
+p.setAttribute('id', 'modal-title')
+modal_head. appendChild(p)
+modal_head.appendChild(close)
+let modal_input = document.createElement('input')
+modal_input.setAttribute('id', 'modal-input')
+modal_input.setAttribute('placeholder', 'Search Tag')
+let modal_button = document.createElement('button')
+modal_button.setAttribute('id', 'modal-button')
+modal_button.textContent = 'Add Tag'
+let modal_header = document.createElement('div')
+modal_header.setAttribute('id', 'modal-header')
+modal_header.appendChild(modal_input)
+modal_header.appendChild(modal_button)
+let modal_tag = document.createElement('div')
+modal_tag.classList.add('modal-tag')
+let modal_tag_container = document.createElement('div')
+modal_tag_container.classList.add('modal-tag-container')
 
-modal_content.appendChild(close)
-modal_content.appendChild(p)
+
+
+
+
+
+
+modal_content.appendChild(modal_head)
+modal_content.appendChild(modal_header)
+modal_content.appendChild(modal_tag)
+
 modal.appendChild(modal_content)
 
 // closing modal only if clicked element is modal background and ...
@@ -44,16 +117,104 @@ close.addEventListener('click', () => {
 } )
 
 
+const showModal = (event) => {
+  let title = p
+  let contact_name = ''
+  if(event.target.parentNode.parentNode.parentNode.id === '') contact_name = event.target.parentNode.parentNode.id, title.textContent = contact_name
+  else contact_name = event.target.parentNode.parentNode.parentNode.id, title.textContent = contact_name
+  
+  let modal_update_button = document.createElement('button')
+  modal_update_button.setAttribute('id', 'modal-update-button')
+  modal_update_button.textContent = 'Update Tag'
 
-document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').appendChild(modal)
+  loadTags()
+  console.log(tags)
+  modal_tag_container.innerHTML = ''
+  
+  tags.forEach(tag => {
+    let modal_tag = document.createElement('div')
+    modal_tag.classList.add('modal-tag')
+    
+
+    let modal_tag_p = document.createElement('p')
+    modal_tag_p.textContent = tag.tag_name
+    modal_tag_p.classList.add('modal-tag-p')
+    
+    
+    let modal_tag_checkbox = document.createElement('input')
+    modal_tag_checkbox.setAttribute('type', 'checkbox')
+    modal_tag_checkbox.classList.add('modal-tag-checkbox')
+    modal_tag.appendChild(modal_tag_checkbox)
+    modal_tag.appendChild(modal_tag_p)
+    
+    modal_tag_container.appendChild(modal_tag)
+    modal_content.append(modal_tag_container)
+    
+    
+  })
+  
+  // delete old modal_update_button
+  const old_update_button = document.querySelector('#modal-update-button')
+  if(old_update_button) {
+    old_update_button.remove()
+  }
+  
+  modal_content.appendChild(modal_update_button)
+
+  modal_update_button.addEventListener('click', () => {
+    modal.style.display = "none";
+    let selected_tags = []
+    let modal_tags = modal_tag_container.querySelectorAll('.modal-tag-checkbox')
+    console.log('modal tags: ' + modal_tags)
+    modal_tags.forEach(checkbox => {
+      if(checkbox.checked) {
+
+        selected_tags.push(checkbox.parentNode.querySelector(".modal-tag-p").textContent)
+      }
+    })
+    console.log('selected tags: ')
+    console.log(selected_tags)
+    
+    console.log('updating friend:   ' + contact_name)
+    updateFriend(contact_name, selected_tags)
+    console.log("friend updated as: ")
+    console.log(JSON.parse(sessionStorage.getItem('tags')))
+
+  })
+}
+
+
+let modal_hook = null
+if(document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb')) {
+  document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb').appendChild(modal)
+} else {
+  const interval = setInterval(function() {
+    if(document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb')) {
+      modal_hook = document.querySelector('.rq0escxv .l9j0dhe7 .du4w35lb')
+      modal_hook.appendChild(modal)
+      clearInterval(interval)
+    }
+  }, 100)
+
+}
+
+
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if(request.type === 'giveMeTags') {
-      chrome.runtime.sendMessage({type: 'saveTags', tags: JSON.parse(sessionStorage.getItem('tags'))});
+      if(content_lived_before) {
+        chrome.runtime.sendMessage({type: 'saveTags', tags: JSON.stringify(tags)});
+      } else {
+        chrome.runtime.sendMessage({type: 'saveTags', tags: null});
+      }
+      
     } else {
-      sessionStorage.setItem('tags', request.message)
-      console.log('request' + sessionStorage.getItem('tags'))
+      let t = request.message
+      //console.log('setting item: ' + JSON.parse(t) )
+      sessionStorage.setItem('tags', JSON.stringify(request.message))
+      console.log('request' + typeof(t))
+
     }
     
   }
@@ -65,18 +226,10 @@ chrome.runtime.onMessage.addListener(
 //  console.log('test')
 //}
 
-function start(data){
-    sessionStorage.setItem('tags', data)
-    console.log(sessionStorage.getItem('tags'))
-}
 
 function updateDom() {
-  
-  tags = JSON.parse(sessionStorage.getItem('tags'))
-  
-  
+  loadTags()
   console.log(tags)
- 
   console.log("updating Dom")
 
   //let thread_count = 0
@@ -104,15 +257,19 @@ function updateDom() {
     thread_list.forEach((thread) => {
       
       if(!thread.querySelector('.thread_input')) {
+        let friend_name = thread.children[0].children[0].children[0].children[0].children[1].children[0].children[0].children[0].textContent
 
         let thread_input = document.createElement("input");
         thread_input.setAttribute("class", "thread_input");
         thread_input.setAttribute("type", "checkbox")
         let tag_container = document.createElement("div");
-        tag_container.setAttribute("class", "tag-container");
+        tag_container.classList.add("tag-container");
+        console.log(friend_name)
+
+        tag_container.setAttribute("id", friend_name)
         
         // Collect friend nickname from div
-        let friend_name = thread.children[0].children[0].children[0].children[0].children[1].children[0].children[0].children[0].textContent
+        
         let friend = {
           "friend_name": friend_name,
           "tags": [],
@@ -128,9 +285,8 @@ function updateDom() {
          friend.tags = []
          // saving test
 
-        // Testing adding tag
 
-        
+
 
 
         
@@ -138,6 +294,9 @@ function updateDom() {
         //updateTag('addFriend', "Tesstingtag", friend.friend_name )
         // Testing removing friend from tag
         thread.setAttribute('id', friend_name)
+
+        loadTags()
+        console.log(tags)
         
         tags = tags.forEach(tag => {
 
@@ -145,7 +304,7 @@ function updateDom() {
             console.log("okk")
             
             friend.tags.push(tag.tag_name)
-            thread.classList.add(tag.tag_name)
+            thread.classList.add(tag.tag_name.replace(/\s+/g, '-').toLowerCase())
             
           }
         })
@@ -185,7 +344,8 @@ function updateDom() {
         tag_container.addEventListener('click', (event) => {
           console.log(friend.friend_name)
           modal.style.display = "block";
-          updateTag('addFriend', "Tesstingtagds", friend.friend_name )
+          showModal(event)
+          //updateTag('addFriend', "Tesstingtagds", friend.friend_name )
 
           updateDom()
         })
@@ -244,7 +404,7 @@ function updateDom() {
               if(person) {
                 
                 
-                thread.classList.add(tag.tag_name)
+                thread.classList.add(tag.tag_name.replace(/\s+/g, '-').toLowerCase())
                 tag_a.textContent = tag.tag_name
                 
               }
@@ -263,6 +423,7 @@ function updateDom() {
 // 2. Data is saved to browser session storage, and saves data in firebase?, then script is using it to render tags and sort friends
 
 const observer = new MutationObserver(() => {
+  console.log('running observer')
   updateDom()
   
 });

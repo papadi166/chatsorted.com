@@ -19,9 +19,14 @@ const downloadFriends = () => {
 downloadFriends();
 console.log("test");
 onMounted(() => {
+  console.log("tags: ");
+  console.log(JSON.parse(JSON.stringify(store.tags)));
+
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, { type: "giveMeTags" });
   });
+
+  //console.log(JSON.parse(store.tags));
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -35,9 +40,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   //  store.addTag(request.tag_name, request.color, request.people);
   //}
   if (request.type === "saveTags") {
-    store.saveTags(request.tags);
-    console.log("vue response: " + request.tags[0].tag_name);
+    //console.log(typeof JSON.parse(JSON.stringify(request.tags)));
+    if (request.tags === null) {
+      console.log("app hasn`t lived before so I start fetching data base");
+    } else {
+      store.saveTags(JSON.parse(request.tags));
+      console.log("vue response: ");
+      console.log(JSON.parse(request.tags));
+      console.log("tags saved as: ");
+      console.log(JSON.parse(JSON.stringify(store.tags)));
+    }
   }
+  //if (request.type === "updateFriend") {
+  //  console.log("updating tags");
+  //  store.updateFriend(request.friend_name, request.tags);
+  //}
   //if (request.type === "addFriend") {
   //  store.addFriend(request.tag_name, request.friend_name);
   //}

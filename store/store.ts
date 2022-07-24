@@ -13,17 +13,12 @@ const Sync = (th) => {
   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
       var activeTab = tabs[0];
       chrome.tabs.sendMessage(activeTab.id, {
-        message: JSON.stringify(th.tags),
+        message: JSON.stringify(th.tags)
       });
     });
 
 }
 
-
-
-
-export type state = () => {
-};
 
 export const useStore = defineStore('chatsorted', {
     state: () => {
@@ -49,11 +44,17 @@ export const useStore = defineStore('chatsorted', {
             { id: uniqid(), tag_name: "example group3", color: 'blue', folded: true, editing: false, people: [
               {realname: 'example example'}
             ] },
-          ]),
+          ], 
+          ),
 
           validated: true,
           actualUrl: '',
-          focused: null
+          focused: null,
+        }
+      },
+      getters: {
+        getTags(state) {
+          return state.tags.value
         }
       },
       actions: {
@@ -73,6 +74,11 @@ export const useStore = defineStore('chatsorted', {
           this.tags = tags
           
         },
+        //updateFriend(friend_name, tags) {
+        //  let friend_tags = this.tags.filter(tag => tag.people.some(e => e.realname === friend_name))
+//
+        //  console.log(friend_tags)
+        //},
         updateTag(tag_name: string, new_tag_name: string) {
           console.log(new_tag_name)
           let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
