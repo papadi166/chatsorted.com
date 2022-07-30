@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
 
      beforeEnter: (to, from, next) => {
       let chrome = window.chrome;
-      chrome.storage.local.get("actualUrl", function (data) {
+      chrome.storage.local.get("actualUrl", function (data: any) {
         store.setActualUrl(data.actualUrl)
         if(store.validated === true && data.actualUrl.startsWith('https://www.messenger.com/')) next()
         else next({name: 'Welcome'})

@@ -2,13 +2,14 @@
 import { reactive, watch, ref, onMounted } from "vue";
 import Navbar from "./components/Navbar.vue";
 import { useStore } from "../store/store";
-import Sync from "./functions/Sync";
+import { Sync } from "./functions/Sync";
 
 let store = useStore();
 let chrome = window.chrome;
 
 const downloadFriends = () => {
-  chrome.storage.local.get("friends", function (data) {
+  chrome.storage.local.get("friends", function (data: Object) {
+    //may be a list
     console.log(data);
   });
 };
@@ -22,14 +23,21 @@ onMounted(() => {
   console.log("tags: ");
   console.log(JSON.parse(JSON.stringify(store.tags)));
 
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { type: "giveMeTags" });
-  });
+  chrome.tabs.query(
+    { active: true, currentWindow: true },
+    function (tabs: any) {
+      chrome.tabs.sendMessage(tabs[0].id, { type: "giveMeTags" });
+    }
+  );
 
   //console.log(JSON.parse(store.tags));
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (
+  request: any,
+  sender: any,
+  sendResponse: any
+) {
   console.log(
     sender.tab
       ? "from a content script:" + sender.tab.url

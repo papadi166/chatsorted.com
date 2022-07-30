@@ -16,7 +16,8 @@
       "unplugin-icons/types/vue",
       "pinia-plugin-persist",
       "pinia"
-    ]
+    ],
+    "typeRoots": ["./node_modules/@types", "./src/types",]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/*.vue", "src/main.js", "views/**/*.vue", "views/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]

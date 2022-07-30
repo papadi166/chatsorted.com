@@ -5,12 +5,13 @@ import piniaPersist from 'pinia-plugin-persist'
 import uniqid from "uniqid";
 import { useStorage } from '@vueuse/core'
 
+const chrome = window.chrome
 
 const pinia = createPinia()
 pinia.use(piniaPersist)
 
-const Sync = (th) => {
-  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+const Sync = (th: any) => {
+  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs: any) {
       var activeTab = tabs[0];
       chrome.tabs.sendMessage(activeTab.id, {
         message: JSON.stringify(th.tags)
@@ -54,7 +55,7 @@ export const useStore = defineStore('chatsorted', {
       },
       getters: {
         getTags(state) {
-          return state.tags.value
+          return state.tags
         }
       },
       actions: {
@@ -70,8 +71,8 @@ export const useStore = defineStore('chatsorted', {
           }
           Sync(this)
         },
-        saveTags(tags: Object) {
-          this.tags = tags
+        saveTags(tags_to_save: any) {
+          this.tags = tags_to_save
           
         },
         //updateFriend(friend_name, tags) {
@@ -82,8 +83,11 @@ export const useStore = defineStore('chatsorted', {
         updateTag(tag_name: string, new_tag_name: string) {
           console.log(new_tag_name)
           let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
-          focusingTag.tag_name = new_tag_name
-          Sync(this)
+          if (focusingTag) {
+            focusingTag.tag_name = new_tag_name
+            Sync(this)
+          }
+          
         },
         //addFriend(tag_name: string, friend_name: string) {
         //  let focusingTag = this.tags.find((tag) => tag.tag_name === tag_name)
@@ -102,13 +106,13 @@ export const useStore = defineStore('chatsorted', {
        // changeTagName(tag_name: string, new_tag_name: string) {
         //
        //},
-        deleteTag(card) {
+        deleteTag(card: any) {
           this.tags = this.tags.filter(tag => {
             return tag.id != card.id;
           });
           Sync(this)
         },
-        setFocused(value: Object) {
+        setFocused(value: any) {
           this.focused = value
         },
         setActualUrl (value: string) {

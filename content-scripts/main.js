@@ -212,7 +212,7 @@ chrome.runtime.onMessage.addListener(
     } else {
       let t = request.message
       //console.log('setting item: ' + JSON.parse(t) )
-      sessionStorage.setItem('tags', JSON.stringify(request.message))
+      sessionStorage.setItem('tags', request.message)
       console.log('request' + typeof(t))
 
     }

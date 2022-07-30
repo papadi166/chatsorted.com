@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useStore } from "../store/store";
-let store = useStore();
+
 import TagPanel from "../src/components/TagPanel.vue";
 import FriendsListPanel from "../src/components/FriendsListPanel.vue";
 import TemplatesPanel from "../src/components/TemplatesPanel/TemplatesPanel.vue";
+let store = useStore();
 </script>
 
 <template lang="pug">

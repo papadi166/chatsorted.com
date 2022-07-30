@@ -59,12 +59,13 @@ const addTag = (tag_name: string, color: string, people: Array<any>) => {
   store.addTag(tag_name, color, people);
 };
 
-const updateTag = (tag_name, event) => {
+const updateTag = (tag_name: string, event: any) => {
   store.updateTag(tag_name, event.target.value);
   //card.tag_name=this.value
 };
 
-const deleteTag = (card) => {
+const deleteTag = (card: any) => {
+  //should be object?
   store.deleteTag(card);
   //card.tag_name=this.value
 };
